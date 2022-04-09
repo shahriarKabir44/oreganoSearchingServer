@@ -13,10 +13,7 @@ const {
 } = graphql;
 
 let user = require('../schemas/user')
-let post = require('../schemas/post')
-let tags = require('../schemas/tags')
-let Order = require('../schemas/order')
-let notification = require('../schemas/notifications')
+
 
 const personalInfoType = new GraphQLObjectType({
     name: "PersonalInfo",
@@ -64,13 +61,7 @@ const UserType = new GraphQLObjectType({
         rating: { type: GraphQLFloat },
         currentCity: { type: GraphQLString },
         id: { type: GraphQLID },
-        lastPost: {
-            type: PostType,
-            async resolve(parent, args) {
-                let data = await post.find({ postedBy: parent.id }).sort({ postedOn: -1 }).limit(1)
-                return data[0]
-            }
-        },
+
         locationInfo: { type: GraphQLString },
         locationInfoJson: {
             type: LocationInfoJSON,
@@ -88,14 +79,13 @@ const RootQueryType = new GraphQLObjectType({
         searchUser: {
             type: new GraphQLList(UserType),
             args: {
-                name: { type: GraphQLString },
-                phone: { type: GraphQLString },
+                query: { type: GraphQLString },
             },
             resolve(parent, args) {
                 return user.find({
-                    $and: [
-                        { name: { $regex: new RegExp(args.name) } },
-                        { phone: { $regex: new RegExp(args.phone) } }
+                    $or: [
+                        { name: { $regex: new RegExp(args.query) } },
+                        { phone: { $regex: new RegExp(args.query) } }
                     ]
                 })
             }
