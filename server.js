@@ -34,7 +34,7 @@ function startExpress() {
 
     app.use('/graphql', graphqlHTTP.graphqlHTTP(req => (
         {
-            schema: require('./graphql/graphql.schema'),
+            schema: require('./graphql/graphql.search.schema'),
             graphiql: true
         }
     )));

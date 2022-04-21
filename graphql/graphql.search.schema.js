@@ -96,6 +96,9 @@ const AvailableItemType = new GraphQLObjectType({
         rating: { type: GraphQLInt },
         unitPrice: { type: GraphQLFloat },
         ratedBy: { type: GraphQLFloat },
+
+        region: { type: GraphQLString },
+
         lowerCasedName: {
             type: GraphQLString,
             resolve(parent, args) {
@@ -313,6 +316,21 @@ const OrderItemType = new GraphQLObjectType({
 const RootQueryType = new GraphQLObjectType({
     name: "rootQuery",
     fields: {
+        getLocalAvailableItems: {
+            type: new GraphQLList(GraphQLString),
+            args: {
+
+                region: { type: GraphQLString },
+            },
+            resolve(parent, args) {
+                return AvailableItem.find({
+                    $and: [
+                        { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } },
+                        { region: args.region }
+                    ]
+                }).distinct('region')
+            }
+        },
         searchByName: {
             type: new GraphQLList(AvailableItemType),
             args: {
