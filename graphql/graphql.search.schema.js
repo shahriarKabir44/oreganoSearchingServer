@@ -319,15 +319,16 @@ const RootQueryType = new GraphQLObjectType({
         getLocalAvailableItems: {
             type: new GraphQLList(GraphQLString),
             args: {
-
+                userId: { type: GraphQLID },
                 region: { type: GraphQLString },
             },
             resolve(parent, args) {
-                console.log(Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)))
+                console.log(args)
                 return AvailableItem.find({
                     $and: [
                         { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } },
-                        { region: args.region }
+                        { region: args.region },
+                        { userId: { $ne: args.userId } }
                     ]
                 }).distinct('tag')
 
