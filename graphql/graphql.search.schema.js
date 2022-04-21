@@ -136,8 +136,8 @@ const AvailableItemType = new GraphQLObjectType({
                         { lowerCasedName: parent.tag },
                         { postedBy: parent.userId }
                     ]
-                }).sort({ postedOn: -1 }).limit(1)
-
+                })
+                console.log(parent);
                 return data[0]
             }
         }
@@ -323,25 +323,31 @@ const RootQueryType = new GraphQLObjectType({
                 region: { type: GraphQLString },
             },
             resolve(parent, args) {
+                console.log(Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)))
                 return AvailableItem.find({
                     $and: [
                         { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } },
                         { region: args.region }
                     ]
-                }).distinct('region')
+                }).distinct('tag')
+
             }
         },
         searchByName: {
             type: new GraphQLList(AvailableItemType),
             args: {
-                tagName: { type: GraphQLString }
+                itemname: { type: GraphQLString },
+                region: { type: GraphQLString },
+                userId: { type: GraphQLID }
             },
             resolve(parent, args) {
 
                 return AvailableItem.find({
                     $and: [
-                        { tag: { $regex: new RegExp(args.tagName.toLowerCase()) } },
-                        { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } }
+                        { tag: { $regex: new RegExp(args.itemname.toLowerCase()) } },
+                        { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } },
+                        { region: args.region },
+                        { userId: { $ne: args.userId } }
                     ]
                 })
             }
@@ -357,7 +363,7 @@ const RootQueryType = new GraphQLObjectType({
                     $and: [
                         { userId: args.userId },
                         { tag: args.tag },
-                        { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } }
+                        { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } },
                     ]
                 })
             }
