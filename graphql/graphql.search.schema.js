@@ -16,7 +16,7 @@ let orderItem = require('../schemas/orderItem')
 let connection = require('../schemas/connection');
 const Tag = require('../schemas/tags');
 const Rating = require('../schemas/rating');
-
+const UserTagRating = require('../schemas/user_tag_rating')
 let user = require('../schemas/user')
 let post = require('../schemas/post')
 let tags = require('../schemas/tags')
@@ -96,7 +96,20 @@ const AvailableItemType = new GraphQLObjectType({
         rating: { type: GraphQLInt },
         unitPrice: { type: GraphQLFloat },
         ratedBy: { type: GraphQLFloat },
-
+        getRatings: {
+            type: GraphQLFloat,
+            async resolve(parent, args) {
+                console.log(parent);
+                let data = await UserTagRating.findOne({
+                    $and: [
+                        { ownerId: parent.userId },
+                        { tagName: parent.tag }
+                    ]
+                })
+                if (!data) return 0
+                return data?.avg_rating
+            }
+        },
         region: { type: GraphQLString },
 
         lowerCasedName: {
@@ -137,7 +150,6 @@ const AvailableItemType = new GraphQLObjectType({
                         { postedBy: parent.userId }
                     ]
                 })
-                console.log(parent);
                 return data[0]
             }
         }
@@ -323,7 +335,6 @@ const RootQueryType = new GraphQLObjectType({
                 region: { type: GraphQLString },
             },
             resolve(parent, args) {
-                console.log(args)
                 return AvailableItem.find({
                     $and: [
                         { day: { $gte: Math.floor(((new Date()) * 1) / (24 * 3600 * 1000)) } },
