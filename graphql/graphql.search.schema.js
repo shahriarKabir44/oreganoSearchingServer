@@ -99,7 +99,6 @@ const AvailableItemType = new GraphQLObjectType({
         getRatings: {
             type: GraphQLFloat,
             async resolve(parent, args) {
-                console.log(parent);
                 let data = await UserTagRating.findOne({
                     $and: [
                         { ownerId: parent.userId },
