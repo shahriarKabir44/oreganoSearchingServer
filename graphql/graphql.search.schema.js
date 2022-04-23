@@ -562,14 +562,13 @@ const RootQueryType = new GraphQLObjectType({
         searchUser: {
             type: new GraphQLList(UserType),
             args: {
-                name: { type: GraphQLString },
-                phone: { type: GraphQLString },
+                query: { type: GraphQLString },
             },
             resolve(parent, args) {
                 return user.find({
-                    $and: [
-                        { name: { $regex: new RegExp(args.name) } },
-                        { phone: { $regex: new RegExp(args.phone) } }
+                    $or: [
+                        { name: { $regex: new RegExp(args.query) } },
+                        { phone: { $regex: new RegExp(args.query) } }
                     ]
                 })
             }
