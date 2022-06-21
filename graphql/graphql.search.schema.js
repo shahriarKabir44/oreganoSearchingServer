@@ -112,11 +112,9 @@ const AvailableItemType = new GraphQLObjectType({
         region: { type: GraphQLString },
         getTodayPosts: {
             type: new GraphQLList(PostType),
-            args: {
-                day: { type: GraphQLInt }
-            },
+
             resolve(parent, args) {
-                let startingTime = args.day * 3600 * 24 * 1000
+                let startingTime = parent.day * 3600 * 24 * 1000
                 return post.find({
                     $and: [
                         { postedBy: parent.userId },
@@ -357,6 +355,21 @@ const RootQueryType = new GraphQLObjectType({
                     ]
                 }).distinct('tag')
 
+            }
+        },
+        getLocalItemsInfo: {
+            type: new GraphQLList(AvailableItemType),
+            args: {
+                day: { type: GraphQLInt },
+                region: { type: GraphQLString }
+            },
+            resolve(parent, args) {
+                return AvailableItem.find({
+                    $and: [
+                        { day: args.day },
+                        { region: args.region }
+                    ]
+                })
             }
         },
         searchByName: {
