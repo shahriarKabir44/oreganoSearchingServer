@@ -110,7 +110,22 @@ const AvailableItemType = new GraphQLObjectType({
             }
         },
         region: { type: GraphQLString },
-
+        getTodayPosts: {
+            type: new GraphQLList(PostType),
+            args: {
+                day: { type: GraphQLInt }
+            },
+            resolve(parent, args) {
+                let startingTime = args.day * 3600 * 24 * 1000
+                return post.find({
+                    $and: [
+                        { postedBy: parent.userId },
+                        { lowerCasedName: parent.tag },
+                        { postedOn: { $gte: startingTime } }
+                    ]
+                })
+            }
+        },
         lowerCasedName: {
             type: GraphQLString,
             resolve(parent, args) {
