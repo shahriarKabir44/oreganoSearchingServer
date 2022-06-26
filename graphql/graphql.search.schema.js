@@ -96,6 +96,16 @@ const AvailableItemType = new GraphQLObjectType({
         rating: { type: GraphQLInt },
         unitPrice: { type: GraphQLFloat },
         ratedBy: { type: GraphQLFloat },
+        numPeopleRated: { type: GraphQLInt },
+        region: { type: GraphQLString },
+        isAvailable: {
+            type: GraphQLInt,
+            resolve(parent, args) {
+                let dayInMs = 24 * 3600 * 1000
+                let today = Math.floor((new Date()) / dayInMs)
+                return today == parent.day ? 1 : 0
+            }
+        },
         getRatings: {
             type: GraphQLFloat,
             async resolve(parent, args) {
@@ -109,7 +119,7 @@ const AvailableItemType = new GraphQLObjectType({
                 return data?.avg_rating
             }
         },
-        region: { type: GraphQLString },
+
         getTodayPosts: {
             type: new GraphQLList(PostType),
 
@@ -188,12 +198,14 @@ const PostType = new GraphQLObjectType({
         district: { type: GraphQLString },
         unitType: { type: GraphQLString },
         lowerCasedName: { type: GraphQLString },
+
         owner: {
             type: UserType,
             resolve(parent, args) {
                 return user.findOne({ _id: parent.postedBy })
             }
-        }
+        },
+
     })
 })
 
@@ -357,6 +369,23 @@ const RootQueryType = new GraphQLObjectType({
 
             }
         },
+        getLocalFreshPosts: {
+            type: new GraphQLList(PostType),
+            args: {
+                day: { type: GraphQLInt },
+                city: { type: GraphQLString }
+            },
+            resolve(parent, args) {
+                let dayStartTime = args.day * 24 * 3600 * 1000
+                return post.find({
+                    $and: [
+                        { postedOn: { $gte: dayStartTime } },
+                        { city: args.city }
+                    ]
+                })
+            }
+
+        },
         getLocalItemsInfo: {
             type: new GraphQLList(AvailableItemType),
             args: {
@@ -366,7 +395,7 @@ const RootQueryType = new GraphQLObjectType({
             resolve(parent, args) {
                 return AvailableItem.find({
                     $and: [
-                        { day: args.day },
+
                         { region: args.region }
                     ]
                 })
@@ -469,7 +498,7 @@ const RootQueryType = new GraphQLObjectType({
                 return await post.findById(args.id)
             }
         },
-         
+
 
         getCreatedPosts: {
             type: new GraphQLList(PostType),
