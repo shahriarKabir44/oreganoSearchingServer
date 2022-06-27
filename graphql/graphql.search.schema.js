@@ -124,7 +124,8 @@ const AvailableItemType = new GraphQLObjectType({
             type: new GraphQLList(PostType),
 
             resolve(parent, args) {
-                let startingTime = parent.day * 3600 * 24 * 1000
+                let dayInMs = 3600 * 24 * 1000
+                let startingTime = Math.floor((new Date()) / dayInMs) * dayInMs
                 return post.find({
                     $and: [
                         { postedBy: parent.userId },
