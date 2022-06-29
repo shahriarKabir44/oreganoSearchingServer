@@ -69,6 +69,8 @@ const UserType = new GraphQLObjectType({
         isRider: { type: GraphQLInt },
         rating: { type: GraphQLFloat },
         currentCity: { type: GraphQLString },
+        currentLocationName: { type: GraphQLString },
+
         id: { type: GraphQLID },
         lastPost: {
             type: PostType,
