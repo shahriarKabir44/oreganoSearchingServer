@@ -108,20 +108,7 @@ const AvailableItemType = new GraphQLObjectType({
                 return today == parent.day ? 1 : 0
             }
         },
-        getRatings: {
-            type: GraphQLFloat,
-            async resolve(parent, args) {
-                let data = await UserTagRating.findOne({
-                    $and: [
-                        { ownerId: parent.userId },
-                        { tagName: parent.tag }
-                    ]
-                })
-                if (!data) return 0
-                return data?.avg_rating
-            }
-        },
-
+         
         getTodayPosts: {
             type: new GraphQLList(PostType),
 
