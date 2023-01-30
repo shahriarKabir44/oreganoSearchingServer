@@ -24,15 +24,7 @@ let Order = require('../schemas/order')
 let notification = require('../schemas/notifications');
 const AvailableItem = require('../schemas/availableItem');
 
-const personalInfoType = new GraphQLObjectType({
-    name: "PersonalInfo",
-    fields: () => ({
 
-        name: { type: GraphQLString },
-        profileImageURL: { type: GraphQLString },
-        coverPhotoURL: { type: GraphQLString }
-    })
-})
 
 const LocationInfoJSON = new GraphQLObjectType({
     name: "LocationInfoJSON",
@@ -53,13 +45,8 @@ const LocationInfoJSON = new GraphQLObjectType({
 const UserType = new GraphQLObjectType({
     name: "User",
     fields: () => ({
-        facebookToken: { type: GraphQLString },
-        personalInfo: {
-            type: personalInfoType,
-            resolve(parent, args) {
-                return JSON.parse(parent.facebookToken)
-            }
-        },
+        profileImageURL: { type: GraphQLString },
+        coverPhotoURL: { type: GraphQLString },
         name: { type: GraphQLString },
         expoPushToken: { type: GraphQLString },
         region: { type: GraphQLString },
@@ -108,7 +95,7 @@ const AvailableItemType = new GraphQLObjectType({
                 return today == parent.day ? 1 : 0
             }
         },
-         
+
         getTodayPosts: {
             type: new GraphQLList(PostType),
 
